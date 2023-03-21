@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 
-export const products: Prisma.ProductCreateInput[] = [
+export const products = [
   {
     name: 'Black shirt with white border',
     description: `Go sporty this summer with this vintage navy and white striped v-neck t-shirt from the Abercrombie & Fitch. Perfect for pairing with denim and white kicks for a stylish sporty vibe. Will fit a UK 8-10, model shown is a UK 8 and 5.`,
