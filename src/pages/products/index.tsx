@@ -8,9 +8,8 @@ import {
   PrimaryLayout,
   ProductsList,
 } from 'components';
-import { api } from 'utils/api';
 import { useRouter } from 'next/router';
-import { CollectionType, ProductColor, ProductSize } from '@prisma/client';
+import { trpc } from 'utils/trpc';
 
 export const getStaticProps: GetStaticProps = async context => {
   return {
@@ -20,25 +19,15 @@ export const getStaticProps: GetStaticProps = async context => {
   };
 };
 
-export function getStaticPaths(): GetStaticPathsResult {
-  return {
-    paths: [],
-    fallback: 'blocking',
-  };
-}
-
 const Products: NextPageWithLayout = () => {
   const router = useRouter();
-  const utils = api.useContext();
 
-  const {
-    slug,
-    rate,
-    page = 1,
-    price,
-    sizes,
-    colors,
-  } = router.query as {
+  const { data, isLoading, isPreviousData } =
+    trpc.product.fetchProducts.useQuery(undefined);
+
+  console.log('## products-', data);
+
+  const { page = 1 } = router.query as {
     slug: string[] | undefined;
     rate: number | undefined;
     page: number | undefined;
@@ -47,39 +36,7 @@ const Products: NextPageWithLayout = () => {
     colors: string | string[] | undefined;
   };
 
-  const queryInput = useMemo(
-    () => ({
-      types: slug && (slug[0].toUpperCase() as CollectionType),
-      slug: slug && slug[1],
-      sizes: [sizes].flat(1).filter(Boolean) as ProductSize[],
-      colors: [colors].flat(1).filter(Boolean) as ProductColor[],
-      page: page && Number(page),
-      rate: rate && Number(rate),
-      gte: price ? (price === '$' ? 0 : price === '$$' ? 10 : 100) : undefined,
-      lte: price
-        ? price === '$'
-          ? 10
-          : price === '$$'
-          ? 100
-          : 1000000
-        : undefined,
-    }),
-    [colors, page, price, rate, sizes, slug]
-  );
-
-  const { data, isLoading, isPreviousData } =
-    api.product.all.useQuery(queryInput);
-
   const pageSize = 12;
-
-  useEffect(() => {
-    if (data) {
-      const totalPageCount = Math.ceil(data.totalCount / pageSize);
-      if (!isPreviousData && totalPageCount > Number(page)) {
-        utils.product.all.prefetch({ ...queryInput, page: Number(page) + 1 });
-      }
-    }
-  }, [data, page, isPreviousData, queryInput, utils]);
 
   return (
     <div className="mx-auto items-center p-4 xl:container">
@@ -88,10 +45,10 @@ const Products: NextPageWithLayout = () => {
           <Navigation />
         </div>
         <div className="flex-[5] rounded-lg bg-white">
-          <ProductsList products={data?.products} isLoading={isLoading} />
+          <ProductsList products={data} isLoading={isLoading} />
           <div className="flex justify-center py-5">
             <Pagination
-              totalCount={data?.totalCount}
+              totalCount={data?.length}
               currentPage={Number(page)}
               pageSize={pageSize}
               onPageChange={page =>

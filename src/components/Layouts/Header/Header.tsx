@@ -12,21 +12,20 @@ import { MegaMenu } from './MegaMenu';
 import { Collections } from 'types';
 import { BottomNavigation } from 'components/Layouts/BottomNavigation/BottomNavigation';
 import { useSession, signOut } from 'next-auth/react';
+import { Cart } from 'components/Cart';
+import { useRouter } from 'next/router';
 const AnnouncementBar = dynamic(() => import('./AnnouncementBar'), {
   ssr: false,
 });
 
 export interface NavLink {
-  name: 'men' | 'women' | 'kids' | 'sale' | 'blog' | 'contacts';
+  name: 'Products' | 'blog' | 'contacts';
   href: string;
   collapsible?: boolean;
 }
 
 export const navLinks: NavLink[] = [
-  { name: 'men', href: '/products/men', collapsible: true },
-  { name: 'women', href: '/products/women', collapsible: true },
-  { name: 'kids', href: '/products/kids' },
-  { name: 'sale', href: '/sale' },
+  { name: 'Products', href: '/products', collapsible: true },
   { name: 'blog', href: '/blog' },
   { name: 'contacts', href: '/contacts' },
 ];
@@ -34,15 +33,17 @@ export const navLinks: NavLink[] = [
 export const sideNavLinks: [string, IconType][] = [
   ['/wishlist', FiHeart],
   ['/cart', FiShoppingBag],
-  ['/signin', FiUser],
+  // ['/signin', FiUser],
 ];
 
 export const Header = ({ collections }: { collections: Collections }) => {
   const { t } = useTranslation('header');
 
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [hoveredNavLink, setHoveredNavLink] = useState<NavLink | null>();
+  const [openCart, setOpenCart] = useState(false);
 
   const handleShowMenu = (navLink: NavLink) => setHoveredNavLink(navLink);
   const handleCloseMenu = () => setHoveredNavLink(null);
@@ -87,15 +88,26 @@ export const Header = ({ collections }: { collections: Collections }) => {
           </ul>
           <ul className="ml-auto items-center md:flex">
             <Search onSearch={value => console.log(value)} />
-            {sideNavLinks.map(([url, Icon]) => (
-              <Link key={url} href={url} className="ml-5 hidden md:block">
-                <Icon
-                  className="text-neutral-700 transition-colors hover:text-violet-700"
-                  size="20px"
-                />
-              </Link>
-            ))}
-            {session && (
+
+            <Link href={'/wishlist'} className="ml-5 hidden md:block">
+              <FiHeart
+                className="text-neutral-700 transition-colors hover:text-violet-700"
+                size="20px"
+              />
+            </Link>
+            <Link
+              href=""
+              onClick={() =>
+                session ? setOpenCart(true) : router.push('/signin')
+              }
+              className="ml-5 hidden md:block"
+            >
+              <FiShoppingBag
+                className="text-neutral-700 transition-colors hover:text-violet-700"
+                size="20px"
+              />
+            </Link>
+            {session ? (
               <button
                 className="ml-5 hidden rounded-full border border-solid border-violet-700 p-[2px] md:block"
                 onClick={() => signOut()}
@@ -111,21 +123,33 @@ export const Header = ({ collections }: { collections: Collections }) => {
                   />
                 )}
               </button>
+            ) : (
+              <Link
+                key={'/signin'}
+                href={'/signin'}
+                className="ml-5 hidden md:block"
+              >
+                <FiUser
+                  className="text-neutral-700 transition-colors hover:text-violet-700"
+                  size="20px"
+                />
+              </Link>
             )}
           </ul>
         </div>
-        <Transition show={Boolean(hoveredNavLink?.collapsible)}>
+        {/* <Transition show={Boolean(hoveredNavLink?.collapsible)}>
           {hoveredNavLink && (
             <MegaMenu
-              type={hoveredNavLink.name === 'men' ? 'MEN' : 'WOMEN'}
+              type={hoveredNavLink?.name === 'Products' ? 'MEN' : 'WOMEN'}
               collections={collections}
               onShowMenu={() => handleShowMenu(hoveredNavLink)}
               onCloseMenu={handleCloseMenu}
             />
           )}
-        </Transition>
+        </Transition> */}
       </div>
       <BottomNavigation navLinks={navLinks} collections={collections} />
+      <Cart open={openCart} setOpen={state => setOpenCart(state)} />
     </header>
   );
 };

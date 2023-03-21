@@ -1,27 +1,12 @@
-import NextAuth, { type NextAuthOptions } from 'next-auth';
-import GithubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
-import TwitterProvider from 'next-auth/providers/twitter';
+import NextAuth, { type NextAuthOptions } from 'next-auth';
+
+// Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { prisma } from 'server/prisma';
-import { env } from 'env/server.mjs';
+import { env } from '../../../env/server.mjs';
+import { prisma } from '../../../server/db/client';
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
-  providers: [
-    GithubProvider({
-      clientId: env.GITHUB_ID,
-      clientSecret: env.GITHUB_SECRET,
-    }),
-    GoogleProvider({
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-    }),
-    TwitterProvider({
-      clientId: env.TWITTER_CLIENT_ID,
-      clientSecret: env.TWITTER_CLIENT_SECRET,
-    }),
-  ],
   // Include user.id on session
   callbacks: {
     session({ session, user }) {
@@ -30,6 +15,37 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    redirect: async ({ url, baseUrl }) => {
+      return Promise.resolve(`${baseUrl}`);
+    },
+  },
+  theme: {
+    colorScheme: 'dark', // "auto" | "dark" | "light"
+    brandColor: '#bbff00', // Hex color code
+    buttonText: '#ff00ff', // Hex color code
+  },
+  logger: {
+    error: message => console.error(message),
+    debug: message => console.debug(message),
+    warn: message => console.warn(message),
+  },
+  // Configure one or more authentication providers
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: 'consent',
+          access_type: 'offline',
+          response_type: 'code',
+        },
+      },
+    }),
+  ],
+  pages: {
+    signIn: '/auth/signin',
   },
 };
 

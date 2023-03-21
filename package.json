@@ -58,6 +58,7 @@
     "next-auth": "^4.19.1",
     "next-i18next": "^13.0.3",
     "nprogress": "^0.2.0",
+    "razorpay": "^2.8.6",
     "react": "^18.2.0",
     "react-animate-height": "^3.1.0",
     "react-countdown": "^2.3.5",
@@ -66,6 +67,7 @@
     "react-icons": "^4.7.1",
     "react-use": "^17.4.0",
     "sharp": "^0.31.3",
+    "shortid": "^2.2.16",
     "superjson": "^1.12.2",
     "tailwind-merge": "^1.9.0",
     "zod": "^3.20.2"
@@ -83,6 +85,7 @@
     "@types/node": "18.13.0",
     "@types/nprogress": "^0.2.0",
     "@types/react": "18.0.27",
+    "@types/shortid": "^0.0.29",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "@typescript-eslint/parser": "^5.50.0",
     "autoprefixer": "^10.4.13",

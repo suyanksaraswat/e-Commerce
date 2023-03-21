@@ -14,6 +14,9 @@ import AOS from 'aos';
 import 'nprogress/nprogress.css';
 import 'styles/globals.css';
 import 'aos/dist/aos.css';
+import RouteValidator from 'utils/RouteValidator';
+import { trpc } from 'utils/trpc';
+import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -54,14 +57,24 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   }, []);
 
   return (
-    <SessionProvider session={pageProps.session}>
-      <main className={`${inter.variable} font-sans`}>
-        {getLayout(<Component {...pageProps} />)}
-        <Analytics />
-      </main>
-      <ReactQueryDevtools />
-    </SessionProvider>
+    <>
+      <Script
+        id="razorpay-checkout-js"
+        src="https://checkout.razorpay.com/v1/checkout.js"
+      />
+      <SessionProvider session={pageProps.session}>
+        <main className={`${inter.variable} font-sans`}>
+          {getLayout(
+            <RouteValidator>
+              <Component {...pageProps} />
+            </RouteValidator>
+          )}
+          <Analytics />
+        </main>
+        <ReactQueryDevtools />
+      </SessionProvider>
+    </>
   );
 }
 
-export default api.withTRPC(appWithTranslation(MyApp));
+export default trpc.withTRPC(appWithTranslation(MyApp));

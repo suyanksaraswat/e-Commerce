@@ -39,22 +39,6 @@ const Signin: NextPageWithLayout = () => {
           />
           {t('auth.google')}
         </button>
-        <button
-          type="button"
-          className="my-1.5 flex w-full items-center justify-center gap-3 rounded-md bg-zinc-900 px-4 py-2 font-medium text-white transition hover:bg-black"
-          onClick={() => signIn('github')}
-        >
-          <BsGithub size="1.2rem" />
-          {t('auth.github')}
-        </button>
-        <button
-          type="button"
-          className="my-1.5 flex w-full items-center justify-center gap-3 rounded-md bg-[#1DA1F2] px-4 py-2 font-medium text-white transition hover:bg-[#0977ba]"
-          onClick={() => signIn('twitter')}
-        >
-          <BsTwitter size="1.2rem" />
-          {t('auth.twitter')}
-        </button>
         <p className="mt-10 text-xs font-normal">
           By signing in, you agree to our{' '}
           <Link href="terms-service" className="text-blue-600 hover:underline">

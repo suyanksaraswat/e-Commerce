@@ -138,7 +138,7 @@ export const MegaMenu = ({
               (item, index) => (
                 <Link
                   key={index}
-                  href={`/products/${typeInLowerCase}/${item}`}
+                  href={`/products/${item}`}
                   className="ml-4 w-full max-w-[150px] py-3 text-xs font-bold text-neutral-800 hover:underline"
                   onClick={onCloseMenu}
                 >
